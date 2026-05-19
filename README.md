@@ -27,3 +27,9 @@ Test:
 ```bash
 curl --noproxy '*' -i http://127.0.0.1:44380/generate_204
 ```
+
+Install latest release binary on a fresh Debian/Ubuntu server:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Lavan1874/captive_portal_fast/main/install_captive_portal_fast.sh | sudo bash
+```
