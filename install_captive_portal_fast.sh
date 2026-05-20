@@ -5,8 +5,7 @@ SERVICE_NAME="captive-portal-fast"
 BIN_PATH="/usr/local/bin/captive_portal_fast"
 DOWNLOAD_URL="${DOWNLOAD_URL:-https://github.com/Lavan1874/captive_portal_fast/releases/latest/download/captive_portal_fast}"
 SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
-TEST_URL="http://127.0.0.1:44380/generate_204"
-SUCCESS_URL="http://127.0.0.1:44380/success.html"
+TEST_URL="http://127.0.0.1:44381/generate_204"
 
 log() {
   printf '[%s] %s\n' "$SERVICE_NAME" "$*"
@@ -104,10 +103,6 @@ self_test() {
   done
 
   [ "${code:-}" = "204" ] || die "/generate_204 returned HTTP ${code:-none}"
-
-  body="$(curl --noproxy '*' -fsS "$SUCCESS_URL")"
-  [ "$body" = "<html><body>Success</body></html>" ] ||
-    die "/success.html returned unexpected body: $body"
 
   log "self test passed"
 }

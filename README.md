@@ -3,12 +3,12 @@
 Minimal local captive portal detection endpoint for Linux. It is designed to
 return a successful probe response as quickly as possible on the local host.
 
-It listens on `127.0.0.1:44380` and returns:
+It listens on `127.0.0.1:44381` and returns a `204 No Content` probe response
+as soon as any request data arrives.
 
-- `GET /generate_204` -> `204 No Content`
-- `HEAD /generate_204` -> `204 No Content`
-- `GET /success.html` -> `200 OK`
-- `HEAD /success.html` -> `200 OK` headers only
+This is an aggressive latency-test endpoint. It does not preserve normal
+per-path HTTP semantics; `/generate_204`, `/success.html`, and unknown paths all
+receive the same successful probe response.
 
 ## Install
 
@@ -124,45 +124,34 @@ journalctl -u captive-portal-fast -p warning --no-pager
 Test `/generate_204`:
 
 ```bash
-curl --noproxy '*' -i http://127.0.0.1:44380/generate_204
+curl --noproxy '*' -i http://127.0.0.1:44381/generate_204
 ```
 
 Expected response:
 
 ```text
 HTTP/1.1 204 No Content
-Connection: close
+Connection: keep-alive
+Keep-Alive: timeout=5
 ```
 
-Test `/success.html`:
+Any request data gets the same successful probe response:
 
 ```bash
-curl --noproxy '*' -i http://127.0.0.1:44380/success.html
-```
-
-Expected response body:
-
-```html
-<html><body>Success</body></html>
-```
-
-Test an unknown path:
-
-```bash
-curl --noproxy '*' -i http://127.0.0.1:44380/unknown
+curl --noproxy '*' -i http://127.0.0.1:44381/anything
 ```
 
 Expected status:
 
 ```text
-HTTP/1.1 404 Not Found
+HTTP/1.1 204 No Content
 ```
 
 Measure request latency:
 
 ```bash
 curl --noproxy '*' -o /dev/null -s -w '%{time_total}\n' \
-  http://127.0.0.1:44380/generate_204
+  http://127.0.0.1:44381/generate_204
 ```
 
 Run 20 latency samples:
@@ -170,7 +159,7 @@ Run 20 latency samples:
 ```bash
 for i in $(seq 1 20); do
   curl --noproxy '*' -o /dev/null -s -w '%{time_total}\n' \
-    http://127.0.0.1:44380/generate_204
+    http://127.0.0.1:44381/generate_204
 done
 ```
 
